@@ -1,10 +1,6 @@
 package Sem2;
 
-import org.json.simple.JSONObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 // 1) Дана строка sql-запроса "select * from students where ". Сформируйте часть WHERE этого запроса, используя StringBuilder.
@@ -12,26 +8,29 @@ import java.util.Map;
 // Параметры для фильтрации: {"name":"Ivanov", "country":"Russia", "city":"Moscow", "age":"null"}
 
 public class Task1 {
-    static String jsonString = "{\"name\":\"Ivanov\", \"country\":\"Russia\", \"city\":\"Moscow\", \"age\":\"null\"}";
+    public static void main(String[] args) {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("name", "Ivanov");
+        map.put("country", "Russia");
+        map.put("city", "Moscow");
+        map.put("age", null);
 
-    public static void main(String[] args) throws JSONException {
+        System.out.println(getRequest(map));
+    }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> map = null;
-        try {
-            map = objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+    public static String getRequest(Map<String, String> finalResult) {
+        StringBuilder result = new StringBuilder();
+        if (finalResult == null || finalResult.isEmpty())
+            return result.toString();
+        for (Map.Entry<String, String> pair : finalResult.entrySet()) {
+            if (pair.getKey() == null || pair.getValue() == null)
+                continue;
+            result.append(pair.getKey()).append(" = '").append(pair.getValue()).append("' and ");
         }
 
-        String name = (String) map.get("name");
-        String city = (String) map.get("city");
-        String country = (String) map.get("country");
+        if (result.length() > 5)
+            result.delete(result.length() - 5, result.length());
 
-        String sqlQuery = "SELECT * FROM students WHERE " + "name = " + name
-                + " AND " + "country = " + country + " AND " + "city = " + city + ";";
-        System.out.println(sqlQuery);
-
+        return result.toString();
     }
 }
